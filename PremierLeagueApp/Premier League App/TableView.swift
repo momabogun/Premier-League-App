@@ -8,26 +8,32 @@
 import SwiftUI
 
 struct TableView: View {
-    @StateObject var viewModel = ViewModel()
+    init(league: AllLeague){
+        self._clubViewModel = StateObject(wrappedValue: ClubViewModel(league: league))
+        self._seasonViewModel = StateObject(wrappedValue: SeasonViewModel(league: league))
+        
+    }
+    @StateObject var seasonViewModel: SeasonViewModel
+    @StateObject var clubViewModel : ClubViewModel
     var body: some View {
         NavigationStack{
             ScrollView{
                 VStack{
-                HStack{
-                    Text("#")
-                        .frame(width: 30, height: 30)
-                    Text("Team")
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    Text("P").frame(width: 50, height: 30)
-                    Text("DIFF").frame(width: 50, height: 30)
-                    Text("PTS").frame(width: 50, height: 30)
-                }.foregroundStyle(.gray)
-                ForEach(viewModel.clubs, id: \.self){ club in
-                    
-                    ClubView(club: club)
-                        .environmentObject(viewModel)
-                    
-                }.listStyle(.plain)
+                    HStack{
+                        Text("#")
+                            .frame(width: 30, height: 30)
+                        Text("Team")
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        Text("P").frame(width: 50, height: 30)
+                        Text("DIFF").frame(width: 50, height: 30)
+                        Text("PTS").frame(width: 50, height: 30)
+                    }.foregroundStyle(.gray)
+                    ForEach(clubViewModel.clubs, id: \.self){ club in
+                        
+                        ClubView(club: club)
+                            .environmentObject(clubViewModel)
+                        
+                    }.listStyle(.plain)
                     
                     VStack(alignment: .leading){
                         Divider()
@@ -46,34 +52,49 @@ struct TableView: View {
                                 .foregroundStyle(.red)
                             Text("Relegation")
                         }
-                        Text("\nEverton - 10 points deducated due to decision of Federation")
-                        Text("\nIn that evemt that two (or more) teams have an equal number of points, the following rulesbreak the tie:\n1.Goal difference\n2.Goal scored")
+                        
                     }.padding()
                         .font(.subheadline)
                     
-                    }
+                }
                 
-                    .navigationBarTitleDisplayMode(.inline)
-                    .toolbar{
-                        ToolbarItem(placement: .principal) {
-                            HStack{
-                                Image("logo")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar{
+                    ToolbarItem(placement: .principal) {
+                        HStack{
+                            AsyncImage(url: clubViewModel.league.logos.light) { image in
+                                image
                                     .resizable()
-                                    .scaledToFill()
-                                    .frame(width: 50, height: 50)
-                                Text("Premier League 23/24")
-                                    .bold()
+                                    .aspectRatio(contentMode: .fill)
+                            } placeholder: {
+                                Image(systemName: "person.crop.square.filled.and.at.rectangle.fill")
+                            }.frame(width: 30, height: 30)
+                            
+                            Text(clubViewModel.league.name)
+                                .bold()
+                            Spacer()
+                            Menu("Filter Menu", systemImage: "line.3.horizontal.decrease.circle.fill") {
+                                    ForEach(seasonViewModel.seasons, id: \.self ){ season in
+                                        Button(season.displayName){
+                                            clubViewModel.year = season.year
+                                        }
+                                            
+                                        
+                                    }
+                                
+                                
                             }
+
                         }
-                        }
-                
-                
+                        
+                    }
+                    
+                    
+                    
+                }
             }
         }
-        }
     }
-
-
-#Preview {
-    TableView()
+    
+    
 }

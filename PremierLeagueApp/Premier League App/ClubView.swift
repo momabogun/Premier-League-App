@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ClubView: View {
-    @EnvironmentObject var viewModel: ViewModel
+    @EnvironmentObject var clubViewModel: ClubViewModel
     let club : Club
     var body: some View {
         HStack(alignment: .center){

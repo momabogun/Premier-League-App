@@ -1,23 +1,22 @@
 //
-//  ViewModel.swift
+//  ClubViewModel.swift
 //  Premier League App
 //
-//  Created by Momcilo Bogunovic on 09.01.24.
+//  Created by Momcilo Bogunovic on 10.01.24.
 //
 
 import Foundation
-class ViewModel: ObservableObject {
+class ClubViewModel: ObservableObject{
     
-    init(){
+    init(league: AllLeague){
+        self.league = league
         fetchData()
     }
-    
-    
-    
     @Published var clubs = [Club]()
     
+    @Published var year = 2023
     
-    
+    let league: AllLeague
     
     func fetchData(){
         Task{
@@ -30,10 +29,11 @@ class ViewModel: ObservableObject {
     }
     
     
+        
     private func fetchClubs() async throws -> [Club] {
         
         
-        guard let url = URL(string: "https://api-football-standings.azharimm.dev/leagues/eng.1/standings?season=2023&sort=asc") else {
+        guard let url = URL(string: "https://api-football-standings.azharimm.dev/leagues/\(league.id)/standings?season=\(year)&sort=asc") else {
             throw HTTPError.invalidURL
         }
         
@@ -46,11 +46,4 @@ class ViewModel: ObservableObject {
         
         return result.data.standings
     }
-    
-    
-    
-    
-    
-    
-    
 }
